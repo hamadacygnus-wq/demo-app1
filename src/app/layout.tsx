@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "食事管理 | joy-syokuji",
-  description: "タブレット向け食事記録アプリ",
+  title: "【デモ】現場入力アプリ",
+  description: "現場の入力データをExcelに自動連携するデモ",
 };
 
 export default function RootLayout({

@@ -68,10 +68,10 @@ export function MealMainScreen() {
   const [isSending, setIsSending] = useState(false);
 
   const [users] = useState<string[]>([
-    "A棟　シグナス太郎　様",
-    "A棟　シグナス花子　様",
-    "B棟　オリオン次郎　様",
-    "C棟　リラ三郎　様",
+    "山田 太郎　様",
+    "鈴木 花子　様",
+    "佐藤 次郎　様",
+    "田中 三郎　様",
   ]);
 
   const [monthlyHistory, setMonthlyHistory] = useState<DayRecord[]>([]);
@@ -228,10 +228,8 @@ export function MealMainScreen() {
     setTableData((prev) => {
       const next = [...prev];
       if (activeTool === "clear") {
-        // 消しゴムツールが選ばれている時は消去する
         next[colIdx] = { ...next[colIdx], judgment: "none" };
       } else {
-        // 〇か×が選ばれている時は、常にそのマークで上書きする（再タップで消えない）
         const mark: CellMark = activeTool === "ok" ? "ok" : "ng";
         next[colIdx] = {
           ...next[colIdx],
@@ -242,33 +240,9 @@ export function MealMainScreen() {
     });
   };
 
-  const onCountPress = (colIdx: number) => {
-    setTableData((prev) => {
-      const next = [...prev];
-      if (activeTool === "clear") {
-        next[colIdx] = { ...next[colIdx], count: 0 };
-      } else {
-        next[colIdx] = {
-          ...next[colIdx],
-          count: next[colIdx].count >= 99 ? 0 : next[colIdx].count + 1,
-        };
-      }
-      return next;
-    });
-  };
-
   return (
     <div className="flex h-screen max-h-screen flex-col bg-slate-100 font-sans overflow-hidden select-none">
-      {isSyncing && (
-        <div className="bg-amber-100 py-1.5 text-center text-xs font-bold text-amber-900 shrink-0">
-          Excel からデータを読み込んでいます…
-        </div>
-      )}
-      {!isSyncing && syncError && (
-        <div className="bg-red-100 py-1.5 text-center text-xs font-bold text-red-900 shrink-0">
-          {syncError}
-        </div>
-      )}
+      {/* デモ録画用にExcel通信ステータスバーは非表示化しています */}
 
       {/* HOME画面 */}
       {view === "HOME" && (
@@ -276,7 +250,7 @@ export function MealMainScreen() {
           <div className="flex flex-col items-center justify-center bg-[#e1f3fb] rounded-2xl p-6 md:p-10 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3 mb-6 md:mb-8 bg-white/60 px-6 py-2.5 rounded-full shadow-inner border border-sky-100">
               <UtensilsCrossed className="h-7 w-7 text-sky-500 stroke-[2.5]" />
-              <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-wider">食事管理アプリ</h1>
+              <h1 className="text-2xl md:text-3xl font-black text-slate-800 tracking-wider">【デモ】食事管理アプリ</h1>
             </div>
             <p className="mb-6 text-lg font-bold text-slate-600">利用者を選んでください。</p>
             
@@ -345,9 +319,9 @@ export function MealMainScreen() {
             </button>
           </header>
 
-          <main className="flex flex-1 bg-white rounded-b-xl shadow-sm border-x border-b border-slate-200 p-4 gap-6 overflow-hidden">
-            {/* 左側ツールバー */}
-            <div className="flex w-36 flex-col items-center justify-center gap-5 border-r border-slate-100 pr-4 shrink-0">
+          <main className="flex flex-1 bg-white rounded-b-xl shadow-sm border-x border-b border-slate-200 p-4 gap-6 overflow-hidden items-center">
+            {/* 左側ツールバー（上下中央揃えに調整） */}
+            <div className="flex w-36 flex-col items-center justify-center gap-5 border-r border-slate-100 pr-4 shrink-0 py-4">
               <button
                 onClick={() => setActiveTool("ok")}
                 className={`flex h-20 w-20 items-center justify-center rounded-full border-4 transition active:scale-90 ${
@@ -379,9 +353,9 @@ export function MealMainScreen() {
               </button>
             </div>
 
-            {/* 右側メインテーブル入力 */}
-            <div className="flex-1 flex flex-col justify-between overflow-hidden">
-              <div className="border border-slate-400 rounded-lg overflow-hidden">
+            {/* 右側メインテーブル入力（判定・メモの2行構成） */}
+            <div className="flex-1 flex flex-col justify-center overflow-hidden h-full">
+              <div className="border border-slate-400 rounded-lg overflow-hidden my-auto">
                 {/* ヘッダー行 */}
                 <div className="grid grid-cols-4 border-b border-slate-400 bg-slate-100 text-center text-lg font-bold text-slate-700">
                   <div className="py-3 bg-slate-200/60 border-r border-slate-400"></div>
@@ -390,14 +364,14 @@ export function MealMainScreen() {
                   ))}
                 </div>
                 
-                {/* --- 判定行 --- */}
+                {/* 1行目：結果（判定）行 */}
                 <div className="grid grid-cols-4 border-b border-slate-400 items-center">
-                  <div className="flex h-24 items-center justify-center bg-slate-50 font-bold border-r border-slate-400 text-slate-700">判定</div>
+                  <div className="flex h-28 items-center justify-center bg-slate-50 font-bold border-r border-slate-400 text-slate-700">結果</div>
                   {tableData.map((data, idx) => (
                     <button
                       key={idx}
                       onClick={() => onJudgmentPress(idx)}
-                      className={`flex h-24 items-center justify-center bg-white hover:bg-slate-50 transition ${idx < 2 ? "border-r border-slate-400" : ""}`}
+                      className={`flex h-28 items-center justify-center bg-white hover:bg-slate-50 transition ${idx < 2 ? "border-r border-slate-400" : ""}`}
                     >
                       {data.judgment === "ok" && <OkMark size="large" />}
                       {data.judgment === "ng" && <NgMark size="large" />}
@@ -405,27 +379,11 @@ export function MealMainScreen() {
                   ))}
                 </div>
 
-                {/* 主食カウント行 */}
-                <div className="grid grid-cols-4 border-b border-slate-400 items-center">
-                  <div className="flex h-24 items-center justify-center bg-slate-50 px-2 text-center text-base font-bold border-r border-slate-400 text-slate-700 leading-tight">
-                    ライス/パン<br />＆スープ
-                  </div>
-                  {tableData.map((data, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => onCountPress(idx)}
-                      className={`flex h-24 items-center justify-center bg-white hover:bg-slate-50 text-4xl font-black text-slate-800 transition ${idx < 2 ? "border-r border-slate-400" : ""}`}
-                    >
-                      {data.count}
-                    </button>
-                  ))}
-                </div>
-
-                {/* メモ行 */}
+                {/* 2行目：メモ行 */}
                 <div className="grid grid-cols-4 items-center">
-                  <div className="flex h-24 items-center justify-center bg-slate-50 font-bold border-r border-slate-400 text-slate-700">メモ</div>
+                  <div className="flex h-28 items-center justify-center bg-slate-50 font-bold border-r border-slate-400 text-slate-700">メモ</div>
                   {tableData.map((data, idx) => (
-                    <div key={idx} className={`h-24 p-1.5 bg-white ${idx < 2 ? "border-r border-slate-400" : ""}`}>
+                    <div key={idx} className={`h-28 p-2 bg-white ${idx < 2 ? "border-r border-slate-400" : ""}`}>
                       <textarea
                         value={data.memo}
                         onChange={(e) => {
@@ -487,7 +445,6 @@ export function MealMainScreen() {
                     <th className="py-3 text-center text-sm md:text-base">朝</th>
                     <th className="py-3 text-center text-sm md:text-base">昼</th>
                     <th className="py-3 text-center text-sm md:text-base">夜</th>
-                    <th className="py-3 text-center text-xs md:text-sm leading-tight">主食<br/>回数</th>
                     <th className="py-3 text-left px-4 text-sm md:text-base">メモ</th>
                   </tr>
                 </thead>
@@ -498,7 +455,6 @@ export function MealMainScreen() {
                       <td className="p-1">{day.morning === "ok" ? <OkMark size="small" /> : day.morning === "ng" ? <NgMark size="small" /> : ""}</td>
                       <td className="p-1">{day.lunch === "ok" ? <OkMark size="small" /> : day.lunch === "ng" ? <NgMark size="small" /> : ""}</td>
                       <td className="p-1">{day.dinner === "ok" ? <OkMark size="small" /> : day.dinner === "ng" ? <NgMark size="small" /> : ""}</td>
-                      <td className="font-extrabold text-xl text-slate-800">{day.stapleCount}</td>
                       <td className="text-left px-4 text-xs md:text-sm whitespace-pre-wrap text-slate-600 max-w-xs truncate">{day.memo || "-"}</td>
                     </tr>
                   ))}
